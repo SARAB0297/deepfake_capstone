@@ -7,10 +7,11 @@ from skimage.filters import gabor_kernel
 from scipy.ndimage import convolve
 from datetime import datetime
 
-INPUT_ROOT = r"D:/Deepfake_/dataset/FakeAVCeleb_Preprocessed"
-OUTPUT_CSV = r"D:/Deepfake_/dataset/FakeAVCeleb_LogGabor_Features.csv"
-LOG_FILE = r"D:/Deepfake_/dataset/skipped_files.log"
-OUTPUT_IMAGE_ROOT = r"D:/Deepfake_/dataset/FakeAVCeleb_LogGabor_Images"
+INPUT_ROOT = "/home/Lakhav_BE/project/data/FakeAVCeleb_Preprocessed"
+OUTPUT_CSV = "/home/Lakhav_BE/project/output/FakeAVCeleb_LogGabor_Features.csv"
+LOG_FILE = "/home/Lakhav_BE/project/output/skipped_files.log"
+OUTPUT_IMAGE_ROOT = "/home/Lakhav_BE/project/output/FakeAVCeleb_LogGabor_Images"
+
 
 FREQUENCIES = [0.1, 0.2, 0.3]
 ORIENTATIONS = [0, np.pi / 4, np.pi / 2, 3 * np.pi / 4]
