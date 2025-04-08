@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import os
 import cv2
 import numpy as np
@@ -8,7 +7,6 @@ from skimage.filters import gabor_kernel
 from scipy.ndimage import convolve
 from datetime import datetime
 
-# ---------- Config ----------
 INPUT_ROOT = r"D:/Deepfake_/dataset/FakeAVCeleb_Preprocessed"
 OUTPUT_CSV = r"D:/Deepfake_/dataset/FakeAVCeleb_LogGabor_Features.csv"
 LOG_FILE = r"D:/Deepfake_/dataset/skipped_files.log"
@@ -20,7 +18,6 @@ KERNEL_SIZE = 21
 MAX_FEATURES = 108
 
 
-# ---------- Feature Extraction ----------
 def extract_log_gabor_features_and_visual(image, save_path):
     features = []
     vis_output = np.zeros_like(image)
@@ -31,11 +28,9 @@ def extract_log_gabor_features_and_visual(image, save_path):
             for c in range(3):  # RGB
                 response = convolve(image[:, :, c], kernel, mode='reflect')
 
-                # Normalize for visualization
                 norm_resp = cv2.normalize(response, None, 0, 255, cv2.NORM_MINMAX)
                 vis_output[:, :, c] += norm_resp.astype(np.uint8) // (len(FREQUENCIES) * len(ORIENTATIONS))
 
-                # Extract features
                 features.extend([
                     np.mean(response),
                     np.std(response),
@@ -47,7 +42,6 @@ def extract_log_gabor_features_and_visual(image, save_path):
     return np.array(features)
 
 
-# ---------- Main Processing ----------
 def extract_features_streaming():
     skipped_files = []
 
@@ -107,6 +101,5 @@ def extract_features_streaming():
     print("Total time: {}".format(datetime.now() - start_time))
 
 
-# ---------- Run ----------
 if __name__ == "__main__":
     extract_features_streaming()
