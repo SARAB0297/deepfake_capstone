@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 import cv2
 import numpy as np
@@ -14,7 +15,7 @@ LOG_FILE = r"D:/Deepfake_/dataset/skipped_files.log"
 OUTPUT_IMAGE_ROOT = r"D:/Deepfake_/dataset/FakeAVCeleb_LogGabor_Images"
 
 FREQUENCIES = [0.1, 0.2, 0.3]
-ORIENTATIONS = [0, np.pi/4, np.pi/2, 3*np.pi/4]
+ORIENTATIONS = [0, np.pi / 4, np.pi / 2, 3 * np.pi / 4]
 KERNEL_SIZE = 21
 MAX_FEATURES = 108
 
@@ -30,21 +31,19 @@ def extract_log_gabor_features_and_visual(image, save_path):
             for c in range(3):  # RGB
                 response = convolve(image[:, :, c], kernel, mode='reflect')
 
-                # Add to visual output (normalize per-channel)
+                # Normalize for visualization
                 norm_resp = cv2.normalize(response, None, 0, 255, cv2.NORM_MINMAX)
                 vis_output[:, :, c] += norm_resp.astype(np.uint8) // (len(FREQUENCIES) * len(ORIENTATIONS))
 
-                # Append features
+                # Extract features
                 features.extend([
                     np.mean(response),
                     np.std(response),
                     np.sum(response ** 2)
                 ])
 
-    # Save transformed visualization
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
     cv2.imwrite(save_path, vis_output, [cv2.IMWRITE_JPEG_QUALITY, 90])
-
     return np.array(features)
 
 
@@ -57,11 +56,11 @@ def extract_features_streaming():
     with open(OUTPUT_CSV, 'w', encoding='utf-8') as f:
         f.write(','.join(headers) + '\n')
 
-    print(f"Starting feature extraction from: {INPUT_ROOT}")
+    print("Starting feature extraction from: {}".format(INPUT_ROOT))
     start_time = datetime.now()
 
     for root, _, files in os.walk(INPUT_ROOT):
-        for file in tqdm(files, desc=f"Processing {root}"):
+        for file in tqdm(files, desc="Processing {}".format(root)):
             if not file.lower().endswith((".jpg", ".png", ".jpeg")):
                 continue
 
@@ -74,7 +73,6 @@ def extract_features_streaming():
 
                 img = img.astype(np.float32) / 255.0
 
-                # Save path for transformed frame
                 rel_path = os.path.relpath(full_path, INPUT_ROOT)
                 transformed_frame_path = os.path.join(OUTPUT_IMAGE_ROOT, rel_path)
 
@@ -95,18 +93,18 @@ def extract_features_streaming():
 
             except Exception as e:
                 skipped_files.append(full_path)
-                print(f"Skipped {full_path}: {e}")
+                print("Skipped {}: {}".format(full_path, str(e)))
                 continue
 
     if skipped_files:
         with open(LOG_FILE, 'w') as log:
             log.write('\n'.join(skipped_files))
-        print(f"\n Skipped files logged to: {LOG_FILE}")
+        print("\nSkipped files logged to: {}".format(LOG_FILE))
 
-    print(f"\n Feature extraction complete.")
-    print(f" Features saved to: {OUTPUT_CSV}")
-    print(f" Transformed frames saved to: {OUTPUT_IMAGE_ROOT}")
-    print(f" Total time: {datetime.now() - start_time}")
+    print("\nFeature extraction complete.")
+    print("Features saved to: {}".format(OUTPUT_CSV))
+    print("Transformed frames saved to: {}".format(OUTPUT_IMAGE_ROOT))
+    print("Total time: {}".format(datetime.now() - start_time))
 
 
 # ---------- Run ----------
