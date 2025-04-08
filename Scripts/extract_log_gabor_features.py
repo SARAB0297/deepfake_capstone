@@ -57,7 +57,7 @@ def extract_features_streaming():
     with open(OUTPUT_CSV, 'w', encoding='utf-8') as f:
         f.write(','.join(headers) + '\n')
 
-    print(f"⏳ Starting feature extraction from: {INPUT_ROOT}")
+    print(f" Starting feature extraction from: {INPUT_ROOT}")
     start_time = datetime.now()
 
     for root, _, files in os.walk(INPUT_ROOT):
@@ -95,18 +95,18 @@ def extract_features_streaming():
 
             except Exception as e:
                 skipped_files.append(full_path)
-                print(f"⚠️ Skipped {full_path}: {e}")
+                print(f" Skipped {full_path}: {e}")
                 continue
 
     if skipped_files:
         with open(LOG_FILE, 'w') as log:
             log.write('\n'.join(skipped_files))
-        print(f"\n⚠️ Skipped files logged to: {LOG_FILE}")
+        print(f"\n Skipped files logged to: {LOG_FILE}")
 
-    print(f"\n✅ Feature extraction complete.")
-    print(f"📄 Features saved to: {OUTPUT_CSV}")
-    print(f"🖼️ Transformed frames saved to: {OUTPUT_IMAGE_ROOT}")
-    print(f"⏱ Total time: {datetime.now() - start_time}")
+    print(f"\n Feature extraction complete.")
+    print(f" Features saved to: {OUTPUT_CSV}")
+    print(f" Transformed frames saved to: {OUTPUT_IMAGE_ROOT}")
+    print(f"Total time: {datetime.now() - start_time}")
 
 
 # ---------- Run ----------
