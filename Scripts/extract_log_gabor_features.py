@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import os
 import cv2
 import numpy as np
@@ -58,11 +57,11 @@ def extract_features_streaming():
     with open(OUTPUT_CSV, 'w', encoding='utf-8') as f:
         f.write(','.join(headers) + '\n')
 
-    print("Starting feature extraction from:", INPUT_ROOT)
+    print(f"Starting feature extraction from: {INPUT_ROOT}")
     start_time = datetime.now()
 
     for root, _, files in os.walk(INPUT_ROOT):
-        for file in tqdm(files, desc="Processing {}".format(root)):
+        for file in tqdm(files, desc=f"Processing {root}"):
             if not file.lower().endswith((".jpg", ".png", ".jpeg")):
                 continue
 
@@ -96,18 +95,18 @@ def extract_features_streaming():
 
             except Exception as e:
                 skipped_files.append(full_path)
-                print("Skipped {}: {}".format(full_path, e))
+                print(f"Skipped {full_path}: {e}")
                 continue
 
     if skipped_files:
         with open(LOG_FILE, 'w') as log:
             log.write('\n'.join(skipped_files))
-        print("Skipped files logged to:", LOG_FILE)
+        print(f"\n Skipped files logged to: {LOG_FILE}")
 
-    print("Feature extraction complete.")
-    print("Features saved to:", OUTPUT_CSV)
-    print("Transformed frames saved to:", OUTPUT_IMAGE_ROOT)
-    print("Total time:", datetime.now() - start_time)
+    print(f"\n Feature extraction complete.")
+    print(f" Features saved to: {OUTPUT_CSV}")
+    print(f" Transformed frames saved to: {OUTPUT_IMAGE_ROOT}")
+    print(f" Total time: {datetime.now() - start_time}")
 
 
 # ---------- Run ----------
