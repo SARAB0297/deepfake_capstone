@@ -6,18 +6,17 @@ from tqdm import tqdm
 from skimage.filters import gabor_kernel
 from scipy.ndimage import convolve
 from datetime import datetime
+import csv
 
 INPUT_ROOT = "/home/Lakhav_BE/project/dataset/FakeAVCeleb_Preprocessed"
 OUTPUT_CSV = "/home/Lakhav_BE/project/dataset/FakeAVCeleb_LogGabor_Features.csv"
 LOG_FILE = "/home/Lakhav_BE/project/dataset/skipped_files.log"
 OUTPUT_IMAGE_ROOT = "/home/Lakhav_BE/project/dataset/FakeAVCeleb_LogGabor_Images"
 
-
 FREQUENCIES = [0.1, 0.2, 0.3]
 ORIENTATIONS = [0, np.pi / 4, np.pi / 2, 3 * np.pi / 4]
 KERNEL_SIZE = 21
 MAX_FEATURES = 108
-
 
 def extract_log_gabor_features_and_visual(image, save_path):
     features = []
@@ -42,14 +41,23 @@ def extract_log_gabor_features_and_visual(image, save_path):
     cv2.imwrite(save_path, vis_output, [cv2.IMWRITE_JPEG_QUALITY, 90])
     return np.array(features)
 
-
 def extract_features_streaming():
     skipped_files = []
 
     headers = ['frame_name', 'label'] + ['feat_{}'.format(i) for i in range(MAX_FEATURES)]
 
-    with open(OUTPUT_CSV, 'w', encoding='utf-8') as f:
-        f.write(','.join(headers) + '\n')
+    # Load already processed frames from existing CSV
+    existing_frames = set()
+    if os.path.exists(OUTPUT_CSV):
+        with open(OUTPUT_CSV, 'r', encoding='utf-8') as f:
+            reader = csv.reader(f)
+            next(reader)  # skip header
+            for row in reader:
+                if row:
+                    existing_frames.add(row[0])
+    else:
+        with open(OUTPUT_CSV, 'w', encoding='utf-8') as f:
+            f.write(','.join(headers) + '\n')
 
     print("Starting feature extraction from: {}".format(INPUT_ROOT))
     start_time = datetime.now()
@@ -57,6 +65,10 @@ def extract_features_streaming():
     for root, _, files in os.walk(INPUT_ROOT):
         for file in tqdm(files, desc="Processing {}".format(root)):
             if not file.lower().endswith((".jpg", ".png", ".jpeg")):
+                continue
+
+            frame_name = file
+            if frame_name in existing_frames:
                 continue
 
             full_path = os.path.join(root, file)
@@ -79,7 +91,6 @@ def extract_features_streaming():
                     features = np.pad(features, (0, MAX_FEATURES - len(features)))
 
                 label = rel_path.split(os.sep)[0]
-                frame_name = os.path.basename(full_path)
 
                 row = [frame_name, label] + features.tolist()
 
@@ -92,15 +103,14 @@ def extract_features_streaming():
                 continue
 
     if skipped_files:
-        with open(LOG_FILE, 'w') as log:
-            log.write('\n'.join(skipped_files))
+        with open(LOG_FILE, 'a') as log:
+            log.write('\n'.join(skipped_files) + '\n')
         print("\nSkipped files logged to: {}".format(LOG_FILE))
 
     print("\nFeature extraction complete.")
     print("Features saved to: {}".format(OUTPUT_CSV))
     print("Transformed frames saved to: {}".format(OUTPUT_IMAGE_ROOT))
     print("Total time: {}".format(datetime.now() - start_time))
-
 
 if __name__ == "__main__":
     extract_features_streaming()
